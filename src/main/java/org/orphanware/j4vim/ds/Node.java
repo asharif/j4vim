@@ -10,7 +10,7 @@ package org.orphanware.j4vim.ds;
  *
  * @author asharif
  */
-public class Node implements Comparable<Node>{
+public class Node implements Comparable<Node>, Jsonable{
     
     private String key;
     private String val;
@@ -52,10 +52,17 @@ public class Node implements Comparable<Node>{
     public void setPrevious(Node back) {
         this.previous = back;
     }
+
+    public LinkedList getChildren() {
+        return children;
+    }
+
+    public void setChildren(LinkedList children) {
+        this.children = children;
+    }
     
     public void addChild(Node node) {
-        
-        children.add(node);
+        this.children.add(node);
     }
 
     public int compareTo(Node o) {
@@ -72,7 +79,17 @@ public class Node implements Comparable<Node>{
         return 0;
     }
     
-    
+    @Override
+    public String toJson() {
+        
+        String json;
+        json = "{ \"key\": \"" + getKey() + "\",";
+        json += "\"value\": \"" + getVal() + "\",";
+        json += "\"children\" : " + children.toJson();
+        json += "}";
+        
+        return json;
+    }
 
     
 }

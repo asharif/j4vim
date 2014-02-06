@@ -49,13 +49,10 @@ public class QuickSort {
             //find left bigger than pivot
             while( ++left_p < end && nodes[left_p].compareTo(pivot) < 0);
             
-            System.out.println("bigger node at " + left_p + ": " + nodes[left_p].getKey());
             
             //find right smaller than pivot
             while( --right_p > start  && nodes[right_p].compareTo(pivot) > 0);
-            
-            System.out.println("smaller node at " + right_p + ": " + nodes[right_p].getKey());
-            
+           
             
             if(left_p >= right_p) {
                 break;

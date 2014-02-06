@@ -44,20 +44,15 @@ public class QuickSortTest extends TestCase {
             nodes[i].setKey(key);
         }
         
-        for(int i=0; i < 10; ++i) {
-            
-            System.out.println(nodes[i].getKey());
-        }
-        
-        System.out.printf("\n");
-        
         QuickSort qs = new QuickSort();
         qs.sort(nodes);
 
         
+        int lastSize = 0;
         for(int i=0; i < 10; ++i) {
             
-            System.out.println(nodes[i].getKey());
+            assertTrue(nodes[i].getKey().length() >= lastSize);
+            
         }
                
     }

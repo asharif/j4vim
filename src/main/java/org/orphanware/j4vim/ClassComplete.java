@@ -14,8 +14,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.orphanware.j4vim.algorithms.QuickSort;
 import org.orphanware.j4vim.ds.LinkedList;
 import org.orphanware.j4vim.ds.Node;
+import org.orphanware.j4vim.ds.Trie;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -27,32 +29,58 @@ import org.reflections.util.ClasspathHelper;
 public final class ClassComplete {
     
     private Set<String> classes = new HashSet<String>();
-    
+    private Trie trie = new Trie();
 
     
-    public ClassComplete(String jars) throws IOException {
+    public ClassComplete(String jars) throws IOException, Exception {
         
         getJarsClasses(jars);
         getJDKClasses();
-        
+        trie.setQuickSort(new QuickSort());
+        trie.buildTrieFromArray(buildNodeArray());
         
         
     }
     
-    private LinkedList buildNodes() {
-
-        LinkedList ll = new LinkedList();
-        for(String fullClass : classes) {
+    public String getClassesByPrefix(String prefix) {
+        
+        List<Node> nodes = trie.getNodesByPrefix(prefix);
+        StringBuilder classesSB = new StringBuilder();
+        
+        for(Node node : nodes) {
             
-            String[] fullClassArr = fullClass.split(".");
+            classesSB.append(node.getKey()).append(",");
+        }
+        
+        String commaClasses = classesSB.toString();
+        commaClasses = commaClasses.substring(0, commaClasses.lastIndexOf(","));
+        return commaClasses;
+        
+    }
+     
+    
+    public String getClassTrieJson() throws Exception {
+        
+
+        return trie.toJson();
+    }
+    
+    private Node[] buildNodeArray() {
+
+        Node[] nodes = new Node[classes.size()];
+        int count = 0;
+        for(String fullClass : classes) {
+
+            String[] fullClassArr = fullClass.split("\\.");
             String className = fullClassArr[fullClassArr.length-1];
             Node tmp = new Node();
             tmp.setKey(className);
             tmp.setVal(fullClass);
+            nodes[count++] = tmp;
             
         }
         
-        return ll;
+        return nodes;
        
     }
     

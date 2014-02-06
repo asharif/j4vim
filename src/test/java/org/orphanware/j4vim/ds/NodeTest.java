@@ -65,4 +65,21 @@ public class NodeTest extends TestCase {
         assertTrue(n2.compareTo(n1) == 0);
         
     }
+    
+    public void testAddChild() {
+        
+        Node n1 = new Node();
+        n1.setKey("a");
+        Node n1a = new Node();
+        n1a.setKey("a1");
+        n1.addChild(n1a);
+        
+        
+        Node n2 = new Node();
+        n2.setKey("b");
+        
+        assertEquals(1, n1.getChildren().getSize());
+        assertEquals(0, n2.getChildren().getSize());
+        
+    }
 }

@@ -6,21 +6,203 @@
 
 package org.orphanware.j4vim.ds;
 
+import java.io.IOException;
+import java.util.List;
+import org.orphanware.j4vim.algorithms.QuickSort;
+
 /**
  *
  * @author asharif
  */
-public class Trie {
+public class Trie implements Jsonable{
     
     private Node root;
+    private QuickSort quickSort;
     
-    public Trie(LinkedList nodes) {
+    public void setQuickSort(QuickSort val) {
         
-        Node[] nodeArr = nodes.toArray();
+        this.quickSort = val;
+    }
+    
+    public Node getRoot() {
+        return this.root;
+    }
+    
+    public Trie() {
         
-        //@TODO: implement quicksort to sort nodeArr and then 
-        //build trie for quick prefix lookup
+    }
+    
+    public void buildTrieFromArray(Node[] nodes) throws Exception {
+        
+        if(this.quickSort == null) {
+            throw new Exception("QuickSort has not been set.  Can't continue");
+        }
+        
+        Node emptyNode = new Node();
+        emptyNode.setKey("");
+        emptyNode.setVal("");
+
+        this.root = emptyNode;
+        
+       for (int i =0; i < nodes.length; ++i) {
+           
+           add(nodes[i]);
+       }
         
     } 
+    
+    public void add(Node node) throws Exception {
+        
+        
+        if( node == null ) {
+            throw new Exception("cannot add 'null' node to trie");
+        }
+        
+        Node curr = this.root;
+        
+        Node parent = getParentForAdd(curr, node);
+        
+        parent.addChild(node);
+        
+    }
+    
+    
+    
+    private Node getParentForAdd(Node curr, Node node) {
+        
+        
+        LinkedList children = curr.getChildren();
+        
+        Node currChild = children.getTail();
+        
+        while(currChild != null) {
+            
+            if( isNodePrefixHit(currChild, node)) {
+                
+                return getParentForAdd(currChild, node);
+            }
+            
+            currChild = currChild.getNext();
+        }
+        
+        
+        return curr;
+    }
+    
+    private Boolean isNodePrefixHit(Node curr, Node newNode) {
+        
+        String currKey = curr.getKey();
+        int currKeyLength = currKey.length();
+        String newKey = newNode.getKey();
+        int newKeyLength  = newKey.length();
+
+        if ( newKeyLength >= currKeyLength) {
+
+            if( newKey.substring(0, currKeyLength).equals(currKey)) {
+                //we have hit
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public void preorderTraverse(Node curr) {
+        
+        if( curr == null) {
+            return;
+        }
+        
+        System.out.println(curr.getKey());
+        
+        preorderTraverse(curr.getNext());
+        
+        LinkedList children = curr.getChildren();
+        preorderTraverse(children.getTail());
+            
+       
+    }
+    
+    
+    public int getSize() {
+        
+        return getSizeRec(this.root);
+    }
+    
+    private int getSizeRec(Node curr) {
+        
+        if( curr == null) {
+            return 0;
+        }
+ 
+        LinkedList children = curr.getChildren();
+        
+        return 1 + getSizeRec(curr.getNext()) + 
+                getSizeRec(children.getTail());
+
+    }
+    
+    public List<Node> getNodesByPrefix(String prefix) {
+        
+        Node prefixNode = new Node();
+        prefixNode.setKey(prefix);
+        
+        Node parent = getParentForSearch(this.root, prefixNode);
+        
+        List<Node> nodes = new java.util.LinkedList<Node>();
+        
+        toList(parent, nodes);
+        
+        return nodes;
+    }
+    
+    
+    
+    private Node getParentForSearch(Node curr, Node node) {
+        
+        
+        LinkedList children = curr.getChildren();
+        
+        Node currChild = children.getTail();
+        
+        while(currChild != null) {
+            
+            if( isNodePrefixHit(currChild, node)) {
+                
+                return currChild;
+            }
+            
+            currChild = currChild.getNext();
+        }
+        
+        
+        return null;
+    }
+    
+    private void toList(Node node, List<Node> list) {
+        
+        if( node == null ) {
+            return;
+        }
+        
+        list.add(node);
+        
+        Node currChild = node.getChildren().getTail();
+        
+        while(currChild != null) {
+            
+            toList(currChild, list);
+            currChild = currChild.getNext();
+        }
+        
+    }
+
+    @Override
+    public String toJson() {
+    
+        return this.root.toJson();
+    }
+    
+    
     
 }

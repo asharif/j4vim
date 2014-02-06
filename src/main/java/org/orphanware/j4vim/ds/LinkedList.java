@@ -10,7 +10,7 @@ package org.orphanware.j4vim.ds;
  *
  * @author asharif
  */
-public class LinkedList {
+public class LinkedList implements Jsonable{
     
     private Node head;
     private Node tail;
@@ -121,6 +121,27 @@ public class LinkedList {
         
         return llArr;
         
+    }
+
+    @Override
+    public String toJson() {
+    
+        String json = "[";
+        Node curr = getTail();
+        
+        while ( curr != null) {
+            
+            json += curr.toJson() + ",";
+            curr = curr.getNext();
+        }
+        
+        if(!json.equals("[")) {
+            json = json.substring(0, json.lastIndexOf(',')) ;
+        }
+        json += "]";
+        
+        return json;
+    
     }
     
     
