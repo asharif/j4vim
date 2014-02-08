@@ -6,11 +6,13 @@
 
 package org.orphanware.j4vim.ds;
 
+import java.io.Serializable;
+
 /**
  *
  * @author asharif
  */
-public class Node implements Comparable<Node>, Jsonable{
+public class Node implements Comparable<Node>, Jsonable, Serializable{
     
     private String key;
     private String val;

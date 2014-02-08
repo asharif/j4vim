@@ -26,13 +26,15 @@ public class ClassCompleteTest extends TestCase {
         return new TestSuite( ClassCompleteTest.class );
     }
     
-    public void testGetClassesByPrefix() throws Exception {
+    public void testGetClassesByPrefixTrie() throws Exception {
         
-        String jar = "/Users/asharif/.m2/repository/org/mockito/mockito-all/1.8.2/mockito-all-1.8.2.jar";
+        String jar = System.getenv("HOME") + "/.m2/repository/org/mockito/mockito-all/1.8.2/mockito-all-1.8.2.jar";
         
-        ClassComplete cc = new ClassComplete(jar);
+        ClassComplete cc = new ClassComplete();
+        cc.addUserClassPath(jar);
         
         System.out.println(cc.getClassesByPrefix("Port"));
     }
+
     
 }

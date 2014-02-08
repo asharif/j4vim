@@ -6,7 +6,12 @@
 
 package org.orphanware.j4vim.ds;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.List;
 import org.orphanware.j4vim.algorithms.QuickSort;
 
@@ -14,15 +19,11 @@ import org.orphanware.j4vim.algorithms.QuickSort;
  *
  * @author asharif
  */
-public class Trie implements Jsonable{
+public class Trie implements Jsonable, Serializable{
     
     private Node root;
     private QuickSort quickSort;
     
-    public void setQuickSort(QuickSort val) {
-        
-        this.quickSort = val;
-    }
     
     public Node getRoot() {
         return this.root;
@@ -30,19 +31,20 @@ public class Trie implements Jsonable{
     
     public Trie() {
         
-    }
-    
-    public void buildTrieFromArray(Node[] nodes) throws Exception {
-        
-        if(this.quickSort == null) {
-            throw new Exception("QuickSort has not been set.  Can't continue");
-        }
+        this.quickSort = new QuickSort();
         
         Node emptyNode = new Node();
         emptyNode.setKey("");
         emptyNode.setVal("");
 
         this.root = emptyNode;
+        
+    }
+    
+    public void buildTrieFromArray(Node[] nodes) throws Exception {
+        
+        
+        
         
        for (int i =0; i < nodes.length; ++i) {
            
@@ -202,7 +204,21 @@ public class Trie implements Jsonable{
     
         return this.root.toJson();
     }
+
+    
+    public Trie getClone() throws IOException, ClassNotFoundException {
+        
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ObjectOutputStream out = new ObjectOutputStream(bout);
+        out.writeObject(this);
+        
+        ByteArrayInputStream bais = new ByteArrayInputStream(bout.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        return (Trie) ois.readObject();
+        
+    }
     
     
     
+   
 }

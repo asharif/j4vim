@@ -6,6 +6,7 @@
 
 package org.orphanware.j4vim;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,8 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import org.orphanware.j4vim.algorithms.QuickSort;
-import org.orphanware.j4vim.ds.LinkedList;
 import org.orphanware.j4vim.ds.Node;
 import org.orphanware.j4vim.ds.Trie;
 import org.reflections.Reflections;
@@ -28,44 +27,43 @@ import org.reflections.util.ClasspathHelper;
  */
 public final class ClassComplete {
     
-    private Set<String> classes = new HashSet<String>();
-    private Trie trie = new Trie();
+    
+    private Trie jdk_trie = new Trie();
+    
+    private Trie full_trie = new Trie();
 
     
-    public ClassComplete(String jars) throws IOException, Exception {
+    public ClassComplete() throws IOException, Exception {
         
-        getJarsClasses(jars);
-        getJDKClasses();
-        trie.setQuickSort(new QuickSort());
-        trie.buildTrieFromArray(buildNodeArray());
-        
-        
+        buildJDKTrie();
+        full_trie = jdk_trie.getClone();
+ 
     }
     
-    public String getClassesByPrefix(String prefix) {
+    private void buildJDKTrie() throws Exception {
         
-        List<Node> nodes = trie.getNodesByPrefix(prefix);
-        StringBuilder classesSB = new StringBuilder();
-        
-        for(Node node : nodes) {
-            
-            classesSB.append(node.getKey()).append(",");
+        Set<String> jdk_classes = new HashSet<String>();
+
+        Reflections reflections = new Reflections(
+                ClasspathHelper.forClass(Object.class),
+                new SubTypesScanner(false));
+        Set<String> types = reflections.getStore().getSubTypesOf(Object.class.getName());
+
+        System.out.println(types.size());
+
+        for (String c : types) {
+
+            if (c.indexOf("$") == -1) {
+                jdk_classes.add(c);
+            }
         }
         
-        String commaClasses = classesSB.toString();
-        commaClasses = commaClasses.substring(0, commaClasses.lastIndexOf(","));
-        return commaClasses;
-        
-    }
-     
-    
-    public String getClassTrieJson() throws Exception {
-        
+        jdk_trie.buildTrieFromArray(buildNodeArray(jdk_classes));
 
-        return trie.toJson();
+       
     }
     
-    private Node[] buildNodeArray() {
+    private Node[] buildNodeArray(Set<String> classes) {
 
         Node[] nodes = new Node[classes.size()];
         int count = 0;
@@ -80,24 +78,41 @@ public final class ClassComplete {
             
         }
         
+        
         return nodes;
        
     }
     
+    public void addUserClassPath(String jars) throws IOException, ClassNotFoundException, Exception {
+        
+        Set<String> user_classes = new HashSet<String>();
+        getJarsClasses(jars, user_classes);
+        
+        Node[] userNodes = buildNodeArray(user_classes);
+        
+        full_trie = jdk_trie.getClone();
+        
+        for(int i=0; i < userNodes.length; ++i) {
+            full_trie.add(userNodes[i]);
+                    
+        }
+    }
+
     
-    private void getJarsClasses(String jars) throws IOException {
+    
+    private void getJarsClasses(String jars, Set<String> user_classes) throws IOException {
 
         String[] classPathArr = jars.split(":");
         
         for(int i=0; i < classPathArr.length; ++i) {
             
-            getJarClasses(jars);
+            getJarClasses(jars, user_classes);
         }
         
 
     }
 
-    private void getJarClasses(String jar) throws FileNotFoundException, IOException {
+    private void getJarClasses(String jar, Set<String> user_classes) throws FileNotFoundException, IOException {
 
         ZipInputStream zip = new ZipInputStream(new FileInputStream(jar));
 
@@ -114,28 +129,36 @@ public final class ClassComplete {
                         className.setLength(className.length() - ".class".length());
                     }
                 }
-                classes.add(className.toString());
+                
+                user_classes.add(className.toString());
             }
         }
     }
 
-    private void getJDKClasses() {
-
-        Reflections reflections = new Reflections(
-                ClasspathHelper.forClass(Object.class),
-                new SubTypesScanner(false));
-        Set<String> types = reflections.getStore().getSubTypesOf(Object.class.getName());
-
-        System.out.println(types.size());
-
-        for (String c : types) {
-
-            if (c.indexOf("$") == -1) {
-                classes.add(c);
-            }
+    
+    public String getClassesByPrefix(String prefix) {
+        
+        List<Node> nodes = full_trie.getNodesByPrefix(prefix);
+        StringBuilder classesSB = new StringBuilder();
+        
+        for(Node node : nodes) {
+            
+            classesSB.append(node.getKey()).append(",");
         }
-
-       
+        
+        String commaClasses = classesSB.toString();
+        int lastComma = commaClasses.lastIndexOf(",");
+        
+        if(lastComma > -1) {
+            commaClasses = commaClasses.substring(0, lastComma);
+        }
+        return commaClasses;
+        
     }
     
+    public String getClassTrieJson() throws Exception {
+        
+
+        return full_trie.toJson();
+    }
 }

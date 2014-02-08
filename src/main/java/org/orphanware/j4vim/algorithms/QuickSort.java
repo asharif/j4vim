@@ -6,13 +6,14 @@
 
 package org.orphanware.j4vim.algorithms;
 
+import java.io.Serializable;
 import org.orphanware.j4vim.ds.Node;
 
 /**
  *
  * @author asharif
  */
-public class QuickSort {
+public class QuickSort implements Serializable{
     
     private Node[] nodes;
     

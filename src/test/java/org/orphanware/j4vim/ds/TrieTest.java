@@ -11,7 +11,6 @@ import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.orphanware.j4vim.algorithms.QuickSort;
 
 /**
  *
@@ -59,7 +58,6 @@ public class TrieTest extends TestCase{
         nodes[5] = n6;
         
         Trie trie = new Trie();
-        trie.setQuickSort(new QuickSort());
         try {
             
             trie.buildTrieFromArray(nodes);
@@ -104,7 +102,6 @@ public class TrieTest extends TestCase{
         nodes[5] = n6;
         
         Trie trie = new Trie();
-        trie.setQuickSort(new QuickSort());
         try {
             
             trie.buildTrieFromArray(nodes);
