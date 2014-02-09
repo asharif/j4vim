@@ -19,7 +19,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.orphanware.App</mainClass>
+                            <mainClass>org.orphanware.j4vim.App</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

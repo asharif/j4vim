@@ -6,12 +6,6 @@
 
 package org.orphanware.j4vim.ds;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.List;
 import org.orphanware.j4vim.algorithms.QuickSort;
 
@@ -19,7 +13,7 @@ import org.orphanware.j4vim.algorithms.QuickSort;
  *
  * @author asharif
  */
-public class Trie implements Jsonable, Serializable{
+public class Trie implements Jsonable{
     
     private Node root;
     private QuickSort quickSort;
@@ -43,9 +37,7 @@ public class Trie implements Jsonable, Serializable{
     
     public void buildTrieFromArray(Node[] nodes) throws Exception {
         
-        
-        
-        
+
        for (int i =0; i < nodes.length; ++i) {
            
            add(nodes[i]);
@@ -148,19 +140,18 @@ public class Trie implements Jsonable, Serializable{
         
         Node prefixNode = new Node();
         prefixNode.setKey(prefix);
-        
-        Node parent = getParentForSearch(this.root, prefixNode);
-        
         List<Node> nodes = new java.util.LinkedList<Node>();
         
-        toList(parent, nodes);
+        gatherNodes(this.root, prefixNode, nodes);
+        
+
         
         return nodes;
     }
     
     
     
-    private Node getParentForSearch(Node curr, Node node) {
+    private void gatherNodes(Node curr, Node node, List<Node> nodes) {
         
         
         LinkedList children = curr.getChildren();
@@ -169,19 +160,25 @@ public class Trie implements Jsonable, Serializable{
         
         while(currChild != null) {
             
-            if( isNodePrefixHit(currChild, node)) {
+            String currKey = currChild.getKey();
+            int currKeyLength = currKey.length();
+            String nodeKey = node.getKey();
+            int nodeKeyLength  = nodeKey.length();
+
+            if(currKeyLength >= nodeKeyLength){
                 
-                return currChild;
+                if(currKey.substring(0, nodeKeyLength).equals(nodeKey)) {
+                    getAllChildren(currChild, nodes);
+                }
             }
-            
+
             currChild = currChild.getNext();
+            
         }
-        
-        
-        return null;
+
     }
     
-    private void toList(Node node, List<Node> list) {
+    private void getAllChildren(Node node, List<Node> list) {
         
         if( node == null ) {
             return;
@@ -193,7 +190,7 @@ public class Trie implements Jsonable, Serializable{
         
         while(currChild != null) {
             
-            toList(currChild, list);
+            getAllChildren(currChild, list);
             currChild = currChild.getNext();
         }
         
@@ -205,20 +202,5 @@ public class Trie implements Jsonable, Serializable{
         return this.root.toJson();
     }
 
-    
-    public Trie getClone() throws IOException, ClassNotFoundException {
-        
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        ObjectOutputStream out = new ObjectOutputStream(bout);
-        out.writeObject(this);
-        
-        ByteArrayInputStream bais = new ByteArrayInputStream(bout.toByteArray());
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        return (Trie) ois.readObject();
-        
-    }
-    
-    
-    
-   
+
 }

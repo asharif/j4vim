@@ -6,13 +6,11 @@
 
 package org.orphanware.j4vim.ds;
 
-import java.io.Serializable;
-
 /**
  *
  * @author asharif
  */
-public class LinkedList implements Jsonable, Serializable{
+public class LinkedList implements Jsonable{
     
     private Node head;
     private Node tail;

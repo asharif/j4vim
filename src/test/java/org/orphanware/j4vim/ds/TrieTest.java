@@ -110,9 +110,10 @@ public class TrieTest extends TestCase{
             e.printStackTrace();
             assertTrue("Trie.buildTrieFromArray failed miserably.  This is probably cause QuickSort was not set", false);
         }
-       
+ 
         List<Node> prefixNodes = trie.getNodesByPrefix("a");
         assertEquals(3, prefixNodes.size());
+
     
     }
 }

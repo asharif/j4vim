@@ -30,10 +30,10 @@ public class ClassCompleteTest extends TestCase {
         
         String jar = System.getenv("HOME") + "/.m2/repository/org/mockito/mockito-all/1.8.2/mockito-all-1.8.2.jar";
         
-        ClassComplete cc = new ClassComplete();
-        cc.addUserClassPath(jar);
+        ClassComplete cc = new ClassComplete(jar);
+
+        assertTrue(!cc.getClassesByPrefix("Port").equals(""));
         
-        System.out.println(cc.getClassesByPrefix("Port"));
     }
 
     

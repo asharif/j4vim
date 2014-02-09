@@ -27,43 +27,79 @@ import org.reflections.util.ClasspathHelper;
  */
 public final class ClassComplete {
     
-    
-    private Trie jdk_trie = new Trie();
-    
-    private Trie full_trie = new Trie();
+    private Set<String> classes = new HashSet<String>();
+    private Trie trie = new Trie();
 
     
-    public ClassComplete() throws IOException, Exception {
+    public ClassComplete(String jars) throws IOException, Exception {
         
-        buildJDKTrie();
-        full_trie = jdk_trie.getClone();
+        getJDKJars();
+        if(jars != null) {
+            getJarsClasses(jars);
+        }
  
+        
+        trie.buildTrieFromArray(buildNodeArray());
     }
     
-    private void buildJDKTrie() throws Exception {
+    private void getJDKJars() {
         
-        Set<String> jdk_classes = new HashSet<String>();
-
         Reflections reflections = new Reflections(
                 ClasspathHelper.forClass(Object.class),
                 new SubTypesScanner(false));
         Set<String> types = reflections.getStore().getSubTypesOf(Object.class.getName());
 
-        System.out.println(types.size());
 
         for (String c : types) {
 
             if (c.indexOf("$") == -1) {
-                jdk_classes.add(c);
+                classes.add(c);
             }
         }
-        
-        jdk_trie.buildTrieFromArray(buildNodeArray(jdk_classes));
-
        
     }
     
-    private Node[] buildNodeArray(Set<String> classes) {
+    
+    
+    
+    
+    private void getJarsClasses(String jars) throws IOException {
+
+        String[] classPathArr = jars.split(":");
+        
+        for(int i=0; i < classPathArr.length; ++i) {
+            
+            getJarClasses(jars);
+        }
+        
+
+    }
+
+    private void getJarClasses(String jar) throws FileNotFoundException, IOException {
+
+        ZipInputStream zip = new ZipInputStream(new FileInputStream(jar));
+
+        for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+            if (entry.getName().endsWith(".class") && !entry.isDirectory()) {
+
+                StringBuilder className = new StringBuilder();
+                for (String part : entry.getName().split("/")) {
+                    if (className.length() != 0) {
+                        className.append(".");
+                    }
+                    className.append(part);
+                    if (part.endsWith(".class")) {
+                        className.setLength(className.length() - ".class".length());
+                    }
+                }
+                
+                classes.add(className.toString());
+            }
+        }
+    }
+    
+    
+    private Node[] buildNodeArray() {
 
         Node[] nodes = new Node[classes.size()];
         int count = 0;
@@ -82,63 +118,11 @@ public final class ClassComplete {
         return nodes;
        
     }
-    
-    public void addUserClassPath(String jars) throws IOException, ClassNotFoundException, Exception {
-        
-        Set<String> user_classes = new HashSet<String>();
-        getJarsClasses(jars, user_classes);
-        
-        Node[] userNodes = buildNodeArray(user_classes);
-        
-        full_trie = jdk_trie.getClone();
-        
-        for(int i=0; i < userNodes.length; ++i) {
-            full_trie.add(userNodes[i]);
-                    
-        }
-    }
-
-    
-    
-    private void getJarsClasses(String jars, Set<String> user_classes) throws IOException {
-
-        String[] classPathArr = jars.split(":");
-        
-        for(int i=0; i < classPathArr.length; ++i) {
-            
-            getJarClasses(jars, user_classes);
-        }
-        
-
-    }
-
-    private void getJarClasses(String jar, Set<String> user_classes) throws FileNotFoundException, IOException {
-
-        ZipInputStream zip = new ZipInputStream(new FileInputStream(jar));
-
-        for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
-            if (entry.getName().endsWith(".class") && !entry.isDirectory()) {
-
-                StringBuilder className = new StringBuilder();
-                for (String part : entry.getName().split("/")) {
-                    if (className.length() != 0) {
-                        className.append(".");
-                    }
-                    className.append(part);
-                    if (part.endsWith(".class")) {
-                        className.setLength(className.length() - ".class".length());
-                    }
-                }
-                
-                user_classes.add(className.toString());
-            }
-        }
-    }
 
     
     public String getClassesByPrefix(String prefix) {
         
-        List<Node> nodes = full_trie.getNodesByPrefix(prefix);
+        List<Node> nodes = trie.getNodesByPrefix(prefix);
         StringBuilder classesSB = new StringBuilder();
         
         for(Node node : nodes) {
@@ -159,6 +143,6 @@ public final class ClassComplete {
     public String getClassTrieJson() throws Exception {
         
 
-        return full_trie.toJson();
+        return trie.toJson();
     }
 }
