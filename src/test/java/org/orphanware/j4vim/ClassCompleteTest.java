@@ -32,7 +32,7 @@ public class ClassCompleteTest extends TestCase {
         
         ClassComplete cc = new ClassComplete(jar);
 
-        assertTrue(!cc.getClassesByPrefix("Port").equals(""));
+        assertTrue(!cc.getClassesByPrefix("Port", false).equals(""));
         
     }
 

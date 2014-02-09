@@ -120,14 +120,18 @@ public final class ClassComplete {
     }
 
     
-    public String getClassesByPrefix(String prefix) {
+    public String getClassesByPrefix(String prefix, boolean fullPackage) {
         
         List<Node> nodes = trie.getNodesByPrefix(prefix);
         StringBuilder classesSB = new StringBuilder();
         
         for(Node node : nodes) {
             
-            classesSB.append(node.getKey()).append(",");
+            if(fullPackage) {
+               classesSB.append(node.getVal()).append(","); 
+            } else {
+                classesSB.append(node.getKey()).append(",");
+            }
         }
         
         String commaClasses = classesSB.toString();

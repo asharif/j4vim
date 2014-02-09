@@ -61,7 +61,7 @@ public class TCPServer {
 
             } else if(inputArr[0].equals("prefix")) {
    
-                 outString = cc.getClassesByPrefix(inputArr[1]);
+                 outString = cc.getClassesByPrefix(inputArr[1], false);
                  
               
             } else {
