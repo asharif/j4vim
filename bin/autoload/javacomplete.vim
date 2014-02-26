@@ -14,7 +14,7 @@ function! javacomplete#Complete(findstart, base)
 			if raw_results != "\n"
 
 				let raw_results_arr = []
-				let raw_results_arr = split(raw_results, ",")
+				let raw_results_arr = split(raw_results, "|")
 				return raw_results_arr
 
 			endif
