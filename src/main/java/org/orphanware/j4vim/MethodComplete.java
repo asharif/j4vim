@@ -109,12 +109,12 @@ public class MethodComplete {
 
         for (Node node : nodes) {
 
-            methodsSB.append(var).append(".").append(node.getKey()).append(",");
+            methodsSB.append(var).append(".").append(node.getKey()).append("|");
 
         }
 
         String commaMethods = methodsSB.toString();
-        int lastComma = commaMethods.lastIndexOf(",");
+        int lastComma = commaMethods.lastIndexOf("|");
 
         if (lastComma > -1) {
             commaMethods = commaMethods.substring(0, lastComma);
