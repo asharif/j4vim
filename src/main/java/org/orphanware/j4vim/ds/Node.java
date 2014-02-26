@@ -21,6 +21,18 @@ public class Node implements Comparable<Node>, Jsonable{
     //trie children
     private LinkedList children = new LinkedList();
 
+	public Node(){
+	}
+
+	public Node(String key) {
+		this.key = key;
+	}
+
+	public Node(String key, String val) {
+		this.key = key;
+		this.val = val;
+	}
+
     public String getKey() {
         return key;
     }

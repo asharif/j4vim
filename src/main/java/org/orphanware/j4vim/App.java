@@ -15,6 +15,7 @@ public class App {
         boolean isServer = false;
         int port = 9999;
         String prefix = null;
+		String code = null;
         String cp = null;
         
         for(int i=0; i < args.length; ++i) {
@@ -57,8 +58,7 @@ public class App {
             if(args[i].equals("-prefix")) {
                 
                 if(args.length < i+1) {
-                    System.out.println("-prefix flag with no prefix");
-                    System.exit(1);
+					prefix = "";
                 } else {
                     prefix = args[i+1];
                 }
@@ -74,6 +74,20 @@ public class App {
                     cp = args[i+1];
                 }
             }
+
+			if(args[i].equals("-code")) {
+				
+				if(args.length < i+1) {
+					
+					System.out.println("-code flag with no code");
+					System.exit(1);
+
+				} else {
+					code = args[i+1];
+				}
+				
+
+			}
             
         }
         
@@ -86,8 +100,11 @@ public class App {
             if(cp != null) {
                 client.setClassPath(cp);
             }
+			if(code != null) {
+				client.setCode(code);
+			}
             if(prefix != null) {
-                System.out.println(client.getClassNameByPrefix(prefix));
+                System.out.println(client.getMethodsByPrefix(prefix));
             }
             
         }

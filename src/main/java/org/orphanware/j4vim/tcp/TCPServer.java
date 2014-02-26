@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import org.orphanware.j4vim.ClassComplete;
+import org.orphanware.j4vim.MethodComplete;
 
 /**
  *
@@ -21,11 +21,10 @@ import org.orphanware.j4vim.ClassComplete;
 public class TCPServer {
     
     private int port;
-    private ClassComplete cc;
+    private MethodComplete mc;
     
     public TCPServer(int port) throws Exception {
         this.port = port;
-        this.cc = new ClassComplete(null);
         
     }
     
@@ -55,13 +54,25 @@ public class TCPServer {
             }
 
             String outString ="";
-            if(inputArr[0].equals("cp")) {
-                cc = new ClassComplete(inputArr[1]);
-             
 
-            } else if(inputArr[0].equals("prefix")) {
+			if(inputArr[0].equals("code")) {
+
+				 this.mc = new MethodComplete(inputArr[1]);
+
+			}else if(inputArr[0].equals("prefix")) {
    
-                 outString = cc.getClassesByPrefix(inputArr[1], false);
+
+				 String[] varPrefixArr = inputArr[1].split("\\.");
+				 String var = varPrefixArr[0];
+				 String prefix = "";
+
+				 if(varPrefixArr.length == 2) {
+
+					 prefix = varPrefixArr[1];
+				 }
+
+				 if( mc != null)
+					 outString = mc.getMethodsForVarByPrefix(var, prefix);
                  
               
             } else {
@@ -70,6 +81,8 @@ public class TCPServer {
             
             DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
             
+			System.out.println(outString);
+
             outToClient.writeBytes(outString + '\n');
          }
     }

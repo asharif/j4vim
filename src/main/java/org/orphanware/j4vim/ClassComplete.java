@@ -3,10 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.orphanware.j4vim;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,29 +24,26 @@ import org.reflections.util.ClasspathHelper;
  * @author asharif
  */
 public final class ClassComplete {
-    
+
     private Set<String> classes = new HashSet<String>();
     private Trie trie = new Trie();
 
-    
     public ClassComplete(String jars) throws IOException, Exception {
-        
+
         getJDKJars();
-        if(jars != null) {
+        if (jars != null) {
             getJarsClasses(jars);
         }
- 
-        
+
         trie.buildTrieFromArray(buildNodeArray());
     }
-    
+
     private void getJDKJars() {
-        
+
         Reflections reflections = new Reflections(
                 ClasspathHelper.forClass(Object.class),
                 new SubTypesScanner(false));
         Set<String> types = reflections.getStore().getSubTypesOf(Object.class.getName());
-
 
         for (String c : types) {
 
@@ -56,22 +51,17 @@ public final class ClassComplete {
                 classes.add(c);
             }
         }
-       
+
     }
-    
-    
-    
-    
-    
+
     private void getJarsClasses(String jars) throws IOException {
 
         String[] classPathArr = jars.split(":");
-        
-        for(int i=0; i < classPathArr.length; ++i) {
-            
+
+        for (int i = 0; i < classPathArr.length; ++i) {
+
             getJarClasses(jars);
         }
-        
 
     }
 
@@ -92,60 +82,53 @@ public final class ClassComplete {
                         className.setLength(className.length() - ".class".length());
                     }
                 }
-                
+
                 classes.add(className.toString());
             }
         }
     }
-    
-    
+
     private Node[] buildNodeArray() {
 
         Node[] nodes = new Node[classes.size()];
         int count = 0;
-        for(String fullClass : classes) {
+        for (String fullClass : classes) {
 
             String[] fullClassArr = fullClass.split("\\.");
-            String className = fullClassArr[fullClassArr.length-1];
+            String className = fullClassArr[fullClassArr.length - 1];
             Node tmp = new Node();
             tmp.setKey(className);
             tmp.setVal(fullClass);
             nodes[count++] = tmp;
-            
+
         }
-        
-        
+
         return nodes;
-       
+
     }
 
-    
-    public String getClassesByPrefix(String prefix, boolean fullPackage) {
-        
+    public String getClassesByPrefix(String prefix) {
+
         List<Node> nodes = trie.getNodesByPrefix(prefix);
         StringBuilder classesSB = new StringBuilder();
-        
-        for(Node node : nodes) {
-            
-            if(fullPackage) {
-               classesSB.append(node.getVal()).append(","); 
-            } else {
-                classesSB.append(node.getKey()).append(",");
-            }
+
+        for (Node node : nodes) {
+
+            classesSB.append(node.getKey()).append("|").append(node.getVal()).append(",");
+
         }
-        
+
         String commaClasses = classesSB.toString();
         int lastComma = commaClasses.lastIndexOf(",");
-        
-        if(lastComma > -1) {
+
+        if (lastComma > -1) {
             commaClasses = commaClasses.substring(0, lastComma);
         }
         return commaClasses;
-        
+
     }
-    
+
     public String getClassTrieJson() throws Exception {
-        
 
         return trie.toJson();
     }

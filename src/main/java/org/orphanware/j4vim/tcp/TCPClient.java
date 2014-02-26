@@ -22,14 +22,28 @@ public class TCPClient {
     public TCPClient(int port) {
         this.port = port;
     }
+
+
+	public void setCode(String code) throws IOException {
+
+		Socket clientSocket = new Socket("localhost", this.port);
+        DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+ 
+        outToServer.writeBytes("code|" + code + '\n');
+        String classes = inFromServer.readLine();
+        clientSocket.close();
+
+
+	}
     
-    public String getClassNameByPrefix(String prefix) throws IOException {
+    public String getMethodsByPrefix(String prefix) throws IOException {
 
         Socket clientSocket = new Socket("localhost", this.port);
         DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
  
-        outToServer.writeBytes("prefix|" + prefix + '\n');
+        outToServer.writeBytes("prefix|" + prefix  + '\n');
         String classes = inFromServer.readLine();
         clientSocket.close();
         
