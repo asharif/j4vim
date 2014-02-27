@@ -36,7 +36,7 @@ public class TCPServer {
         
         
         
-        System.out.println("j4vim server  started!");
+        System.out.println("j4vim server started!");
         
         while(true)
          {
@@ -46,6 +46,9 @@ public class TCPServer {
                new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
             
             String inString = inFromClient.readLine();
+
+			if(inString.equals("kill"))
+				break;
            
             String[] inputArr = inString.split("\\|");
             
@@ -85,10 +88,9 @@ public class TCPServer {
 
             outToClient.writeBytes(outString + '\n');
          }
-    }
-    
 
-    
-    
+
+        System.out.println("j4vim server was killed explicidly");
+    }
     
 }

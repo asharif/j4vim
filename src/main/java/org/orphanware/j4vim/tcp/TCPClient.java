@@ -31,7 +31,6 @@ public class TCPClient {
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
  
         outToServer.writeBytes("code|" + code + '\n');
-        String classes = inFromServer.readLine();
         clientSocket.close();
 
 
@@ -51,18 +50,16 @@ public class TCPClient {
         
     }
     
-    public void setClassPath(String cp) throws IOException {
-        
+    public void killServer() throws IOException {
 
         Socket clientSocket = new Socket("localhost", this.port);
         DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
  
-        outToServer.writeBytes("cp|" + cp + '\n');
-        String fromServer = inFromServer.readLine();
+        outToServer.writeBytes("kill" + '\n');
         clientSocket.close();
-  
+	}
         
-    }
+        
     
 }

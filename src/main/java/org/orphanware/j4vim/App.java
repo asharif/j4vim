@@ -3,7 +3,8 @@ package org.orphanware.j4vim;
 import java.io.IOException;
 import org.orphanware.j4vim.tcp.TCPClient;
 import org.orphanware.j4vim.tcp.TCPServer;
-
+import jodd.util.ClassLoaderUtil;
+import java.io.File;
 
 
 public class App {
@@ -17,6 +18,7 @@ public class App {
         String prefix = null;
 		String code = null;
         String cp = null;
+		boolean kill = false;
         
         for(int i=0; i < args.length; ++i) {
         
@@ -88,18 +90,39 @@ public class App {
 				
 
 			}
+
+			if(args[i].equals("-kill")) {
+				
+				kill = true;	
+
+			}
             
         }
         
         if(isServer) {
+
+			if(cp != null) {
+
+				String[] paths = cp.split(":");
+				for( String path : paths){
+
+					File f = new File(path);
+					ClassLoaderUtil.addFileToClassPath(f, ClassLoader.getSystemClassLoader());
+				}
+            }
+
             TCPServer server = new TCPServer(port);
-            
             server.startServer();
+
         } else {
             TCPClient client = new TCPClient(port);
-            if(cp != null) {
-                client.setClassPath(cp);
-            }
+
+			if(kill == true) {
+
+				client.killServer();
+				return;
+			}
+            
 			if(code != null) {
 				client.setCode(code);
 			}

@@ -29,12 +29,20 @@ public class MethodComplete {
 		varClassMap = new HashMap<>();
 		classMethodTrieMap = new HashMap();
 
-		Matcher m = Pattern.compile("\\s*(\\w+)\\s+(\\w+)\\s*=").matcher(code);
+		Matcher m = Pattern.compile("\\s*(\\w+|\\w+<[^;]*>)\\s+(\\w+)\\s*=").matcher(code);
 
 		while(m.find()) {
 
+			System.out.println(m.group(0));
 			String className = m.group(1);
+			int ltIndex = className.indexOf("<");
+
+			if( ltIndex > -1 ) {
+				className = className.substring(0, ltIndex);
+			}
+
 			String varName = m.group(2);
+
 			String packageName = getPackageNameOfClass(className, code);
 			System.out.println(varName + ":" + packageName + "." + className);
 			varClassMap.put(varName, packageName + "." + className);
@@ -104,6 +112,10 @@ public class MethodComplete {
 
 		Trie trie = classMethodTrieMap.get(fullClass);
 		
+		if(trie == null) {
+			return "";
+		}
+
 		List<Node> nodes = trie.getNodesByPrefix(prefix);
         StringBuilder methodsSB = new StringBuilder();
 

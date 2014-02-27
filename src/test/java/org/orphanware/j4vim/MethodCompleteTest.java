@@ -20,10 +20,23 @@ public class MethodCompleteTest extends TestCase {
 		return new TestSuite( MethodCompleteTest.class );
 	}
 
-	public void testGetMethodsForVarByPrefix(){
+	public void testGetMethodsForVarByPrefixNoGeneric(){
 
-		MethodComplete mc = new MethodComplete("import java.util.LinkedList; LinkedList a = new LinkedList()");
-		System.out.println(mc.getMethodsForVarByPrefix("a", ""));
+		MethodComplete mc = new MethodComplete("import java.util.LinkedList; LinkedList a = new LinkedList();");
+		String out = mc.getMethodsForVarByPrefix("a", "");
+		System.out.println(out);
+		assertNotSame("", out);
+
+
+	}
+
+
+	public void testGetMethodsForVarByPrefixWithGeneric(){
+
+		MethodComplete mc = new MethodComplete("import java.util.LinkedList; LinkedList<String, String> a = new LinkedList<>();");
+		String out = mc.getMethodsForVarByPrefix("a", "");
+		System.out.println(out);
+		assertNotSame("", out);
 
 
 	}
