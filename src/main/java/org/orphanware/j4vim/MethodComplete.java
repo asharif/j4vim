@@ -9,16 +9,26 @@ import org.orphanware.j4vim.ds.Node;
 import org.orphanware.j4vim.ds.Trie;
 import java.lang.reflect.Method;
 import java.lang.ClassNotFoundException;
-
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.IOException;
 
 public class MethodComplete {
 
 	private Map<String, String> varClassMap;
 	private Map<String, Trie> classMethodTrieMap;
 
-	public MethodComplete(String code) { 
+	public MethodComplete(String sourcePath) { 
 
-		initDataStruct(code);
+		try {
+
+			String code = new String(Files.readAllBytes(Paths.get(sourcePath)));
+			initDataStruct(code);
+
+		} catch (IOException e) {
+
+			System.out.println("could not find file: " + sourcePath);
+		}
 	}
 
 	/**
@@ -29,11 +39,10 @@ public class MethodComplete {
 		varClassMap = new HashMap<>();
 		classMethodTrieMap = new HashMap();
 
-		Matcher m = Pattern.compile("\\s*(\\w+|\\w+<[^;]*>)\\s+(\\w+)\\s*=").matcher(code);
+		Matcher m = Pattern.compile("\\s*(\\w+|\\w+<[^;]*>)\\s+(\\w+)\\s*(;|=)").matcher(code);
 
 		while(m.find()) {
 
-			System.out.println(m.group(0));
 			String className = m.group(1);
 			int ltIndex = className.indexOf("<");
 
@@ -44,6 +53,9 @@ public class MethodComplete {
 			String varName = m.group(2);
 
 			String packageName = getPackageNameOfClass(className, code);
+			if( packageName.equals(""))
+					continue;
+
 			System.out.println(varName + ":" + packageName + "." + className);
 			varClassMap.put(varName, packageName + "." + className);
 			addMethodTrie(packageName, className);
@@ -105,7 +117,12 @@ public class MethodComplete {
 
 	public String getMethodsForVarByPrefix(String var, String prefix) {
 
+		var = var.trim();
+
+		System.out.println("var is: " + var);
+		System.out.println("prefix is: " + prefix);
 		String fullClass = varClassMap.get(var);
+		
 
 		if(fullClass == null)
 			return "";

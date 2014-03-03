@@ -1,6 +1,6 @@
 setlocal foldmethod=indent
 set completeopt=longest,menuone
-"inoremap <Enter> <C-R>=SetCode()<CR><Enter>
+inoremap <Enter> <C-R>=SetCode()<CR><Enter>
 
 
 function! InitJ4Vim()
@@ -35,7 +35,7 @@ endfunction
 function! SetCode()
 
 	let code = join(getline(1,'$'), " ")
-	let result = system("java -jar ~/.vim/j4vim.jar -code " .  shellescape(code) . "")
+	let result = system("java -jar ~/.vim/j4vim.jar -code " . shellescape(expand('%:p')))
 	return ""
 endfunction
 

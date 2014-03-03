@@ -60,11 +60,12 @@ public class TCPServer {
 
 			if(inputArr[0].equals("code")) {
 
+				 System.out.println(inputArr[1]);
+
 				 this.mc = new MethodComplete(inputArr[1]);
 
 			}else if(inputArr[0].equals("prefix")) {
    
-
 				 String[] varPrefixArr = inputArr[1].split("\\.");
 				 String var = varPrefixArr[0];
 				 String prefix = "";
@@ -84,7 +85,7 @@ public class TCPServer {
             
             DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
             
-			System.out.println(outString);
+			System.out.print(outString);
 
             outToClient.writeBytes(outString + '\n');
          }
